@@ -2,21 +2,22 @@ using UnityEngine;
 
 namespace DefaultNamespace
 {
-    internal class KdNode
+    public class KdNode
     {
-//        internal IPositionComponent PositionComponent;
-        internal Vector3 PositionComponent;
+        internal Vector3 Key;
         internal KdNode LeftNode;
         internal KdNode RightNode;
         internal KdNode ParentNode;
 
-        internal int Level;
-
+        public int  heightLevel;
+        public int Level;
+        
         public KdNode(int lvl, Vector3 v, KdNode parent = null)
         {
             Level = lvl;
-            PositionComponent = v;
+            Key = v;
             ParentNode = parent;
+            heightLevel = 0;
         }
     }
 }
