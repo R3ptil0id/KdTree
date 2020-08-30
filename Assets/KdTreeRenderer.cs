@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using DefaultNamespace;
 using UnityEngine;
 
@@ -23,19 +24,33 @@ public class KdTreeRenderer : MonoBehaviour
     void Awake()
     {
         _tree = new KdTree();
-        _tree.AddNode(playerPos);
-//        _tree.Insert(playerPos);
-        
+        points.Add(playerPos);
+
+        var list = new List<IPositionComponent>(points.Count);
         foreach (var point in points)
         {
-            _tree.AddNode(point);
-//            _tree.Insert(point);
+            var posComponent = new ComponentTestImpimentation(point.ConvertToSystemNumericsVector3());
+            list.Add(posComponent);
         }
+        
+        _tree.GenerateTree(list);
     }
 
     // Update is called once per frame
     void Update()
     {
         _tree?.UpdateTree();   
+    }
+}
+
+class ComponentTestImpimentation : IPositionComponent
+{
+    public System.Numerics.Vector3 Position { get; }
+    public Guid Guid { get; }
+
+    public ComponentTestImpimentation(System.Numerics.Vector3 position)
+    {
+        Position = position;
+        Guid = Guid.NewGuid();
     }
 }

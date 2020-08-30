@@ -1,23 +1,19 @@
-using UnityEngine;
-
 namespace DefaultNamespace
 {
     public class KdNode
     {
-        internal Vector3 Key;
+        internal IPositionComponent Key;
         internal KdNode LeftNode;
         internal KdNode RightNode;
         internal KdNode ParentNode;
 
-        public int  heightLevel;
         public int Level;
         
-        public KdNode(int lvl, Vector3 v, KdNode parent = null)
+        public KdNode(IPositionComponent positionComponent, int lvl, KdNode parent = null)
         {
             Level = lvl;
-            Key = v;
+            Key = positionComponent;
             ParentNode = parent;
-            heightLevel = 0;
         }
     }
 }

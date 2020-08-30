@@ -1,9 +1,11 @@
-using UnityEngine;
+using System;
+using System.Numerics;
 
 namespace DefaultNamespace
 {
     public interface IPositionComponent
     {
-        Vector3 Position { get; set; }
+        Vector3 Position { get;}
+        Guid Guid { get; }
     }
 }

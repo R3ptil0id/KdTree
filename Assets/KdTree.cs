@@ -1,4 +1,6 @@
-using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
 
 namespace DefaultNamespace
 {
@@ -6,17 +8,17 @@ namespace DefaultNamespace
     {
         private KdNode _root;
 
-        public void Insert(Vector3 pos, KdNode node = null)
+        private void Insert(IPositionComponent pos, KdNode node = null)
         {
             if (_root == null)
             {
-                _root = new KdNode(0, pos);
+                _root = new KdNode(pos, 0);
                 return;
             }
 
             var parent = node ?? _root;
-            var splitParent = parent.Level % 2 == 0 ? parent.Key.x : parent.Key.y;
-            var splitCurrent = parent.Level % 2 == 0 ? pos.x : pos.y;
+            var splitParent = parent.Level % 2 == 0 ? parent.Key.Position.X : parent.Key.Position.Y;
+            var splitCurrent = parent.Level % 2 == 0 ? pos.Position.X : pos.Position.Y;
 
             if (splitCurrent < splitParent)
             {
@@ -26,7 +28,7 @@ namespace DefaultNamespace
                 }
                 else
                 {
-                    var newNode = new KdNode(parent.Level+1, pos, parent);
+                    var newNode = new KdNode(pos,parent.Level+1, parent);
                     parent.LeftNode = newNode;
                 }
             }
@@ -38,37 +40,52 @@ namespace DefaultNamespace
                 }
                 else
                 {
-                    var newNode = new KdNode(parent.Level+1, pos, parent);
+                    var newNode = new KdNode(pos,parent.Level+1, parent);
                     parent.RightNode = newNode;
                 }
             }
         }
 
-        public void AddNode(Vector3 pos)
+        public void GenerateTree(List<IPositionComponent> list)
+        {
+            var sorted = list.OrderBy(c => c.Position.X).ToList();
+            var index = sorted.Count/2;
+            var median = sorted[index];
+            sorted.RemoveAt(index);
+            sorted.Insert(0, median);
+            
+            foreach (var positionComponent in sorted)
+            {
+                AddNode(positionComponent);
+            }
+        }
+
+        private void AddNode(IPositionComponent posComponent)
         {
             if (_root == null)
             {
-                _root = new KdNode(0, pos);
+                _root = new KdNode(posComponent, 0);
                 return;
             }
 
             var current = _root;
             var parent = _root;
-            var splittedCurrent = 0f;
-            var splittedNew = 0f;
+            var isRightBranch = false;
 
             while (current != null)
             {
-                splittedCurrent = GetSplited(current.Level, current.Key);
-                splittedNew = GetSplited(current.Level, pos);
+                var splittedCurrent = GetSplited(current.Level, current.Key.Position);
+                var splittedNew = GetSplited(current.Level, posComponent.Position);
+
+                isRightBranch = splittedCurrent < splittedNew;
 
                 parent = current;
-                current = splittedCurrent < splittedNew ? current.RightNode : current.LeftNode;
+                current = isRightBranch ? current.RightNode : current.LeftNode;
             }
 
-            var newNode = new KdNode(parent.Level + 1, pos, parent);
+            var newNode = new KdNode( posComponent, parent.Level + 1, parent);
 
-            if (splittedCurrent < splittedNew)
+            if (isRightBranch)
                 parent.RightNode = newNode;
             else
                 parent.LeftNode = newNode;
@@ -76,7 +93,7 @@ namespace DefaultNamespace
 
         private float GetSplited(int lvl, Vector3 pos)
         {
-            return lvl % 2 == 0 ? pos.x : pos.y;
+            return lvl % 2 == 0 ? pos.X : pos.Y;
         }
 
         public void UpdateTree()
