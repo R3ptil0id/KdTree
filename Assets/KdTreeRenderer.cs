@@ -6,6 +6,7 @@ using UnityEngine;
 public class KdTreeRenderer : MonoBehaviour
 {
     private KdTree _tree;
+    private XTree _xTree;
     
     public List<Vector3 > points = new List<Vector3>
     {
@@ -21,19 +22,33 @@ public class KdTreeRenderer : MonoBehaviour
     
     Vector3 playerPos = new Vector3(0,1,1);
     
+    private List<int > Xpoints = new List<int>
+    {
+        0, -20, 1, 50, 52
+    };
+    
     void Awake()
     {
-        _tree = new KdTree();
-        points.Add(playerPos);
-
-        var list = new List<IPositionComponent>(points.Count);
-        foreach (var point in points)
+        _xTree = new XTree();
+        var list = new List<IPositionComponent>(Xpoints.Count);
+        foreach (var point in Xpoints)
         {
-            var posComponent = new ComponentTestImpimentation(point.ConvertToSystemNumericsVector3());
+            var posComponent = new ComponentTestImpimentation(new System.Numerics.Vector3(point, 0,0));
             list.Add(posComponent);
         }
+        _xTree.GenerateTree(list);
         
-        _tree.GenerateTree(list);
+//        _tree = new KdTree();
+//        points.Add(playerPos);
+//
+//        var list = new List<IPositionComponent>(points.Count);
+//        foreach (var point in points)
+//        {
+//            var posComponent = new ComponentTestImpimentation(point.ConvertToSystemNumericsVector3());
+//            list.Add(posComponent);
+//        }
+//        
+//        _tree.GenerateTree(list);
     }
 
     // Update is called once per frame
